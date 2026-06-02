@@ -60,7 +60,7 @@ void ClassToggleTool::mousePressEvent(QMouseEvent* event) {
   writeLog("mousePressEvent triggered");
 
   if (_viewer) {
-    QPointF clickPos = event->pos();
+    QPoint clickPos = event->pos();
     QPointF scenePos = _viewer->mapToScene(clickPos);
 
     qDebug() << "[ClassToggleTool] clickPos (widget):" << clickPos;
