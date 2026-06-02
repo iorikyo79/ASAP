@@ -70,7 +70,10 @@ void ClassToggleTool::mousePressEvent(QMouseEvent* event) {
     writeLog(QString("Found %1 items at click position").arg(items.size()));
 
     for (QGraphicsItem* item : items) {
-      if (item->data(0).toString() == "QtAnnotation") {
+      QString itemData = item->data(0).toString();
+      qDebug() << "[ClassToggleTool] item->data(0):" << itemData;
+      writeLog("item->data(0): " + itemData);
+      if (itemData == "QtAnnotation") {
         QtAnnotation* clicked = static_cast<QtAnnotation*>(item);
         qDebug() << "[ClassToggleTool] Found QtAnnotation";
         writeLog("Found QtAnnotation");
