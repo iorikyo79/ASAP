@@ -20,13 +20,13 @@ public:
   void setInterpolationType(const std::string& interpolationType);
   std::string getInterpolationType();
   QPainterPath getCurrentPath(const std::vector<Point>& coords) const;
-  bool contains(const QPointF & point) const;
   bool collidesWithPath(const QPainterPath & path, Qt::ItemSelectionMode mode = Qt::IntersectsItemShape) const;
   QPointF getLastClickedLinePoint();
   void setHover(bool hover);
   bool isHovered() const;
 
   int type() const override { return Type; }
+  QPainterPath shape() const override { return _currentPath; }
 
 private:
   QColor _rectColor;
