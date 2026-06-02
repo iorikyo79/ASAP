@@ -31,6 +31,7 @@ class ANNOTATIONPLUGIN_EXPORT AnnotationWorkstationExtensionPlugin : public Work
 
     friend class CreateAnnotationCommand;
     friend class DeleteAnnotationCommand;
+    friend class SetAnnotationColorCommand;
 
 public :
     bool initialize(PathologyViewer* viewer);

@@ -7,7 +7,7 @@
 #include <iostream>
 #include <cmath>
 
-PolyQtAnnotation::PolyQtAnnotation(const std::shared_ptr<Annotation>& annotation, QObject* parent, float scale) : 
+PolyQtAnnotation::PolyQtAnnotation(const std::shared_ptr<Annotation>& annotation, QObject* parent, float scale) :
   QtAnnotation(annotation, parent, scale),
   _lineThickness(3),
   _lineAnnotationSelectedThickness(4.5),
@@ -17,7 +17,8 @@ PolyQtAnnotation::PolyQtAnnotation(const std::shared_ptr<Annotation>& annotation
   _type("spline"),
   _currentLoD(1.0),
   _lastClickedLinePoint(QPointF()),
-  _fill(false)
+  _fill(false),
+  _hovered(false)
 {
 
 }
@@ -155,6 +156,19 @@ void PolyQtAnnotation::paint(QPainter *painter, const QStyleOptionGraphicsItem *
           painter->fillPath(_currentPath, QBrush(fillColor));
         }
       }
+
+      // Hover effect
+      if (_hovered) {
+        QColor hoverColor = lineColor;
+        hoverColor.setAlpha(80);
+        QPainterPath path;
+        if (_type == "spline") {
+          path.addPolygon(_polys);
+        } else {
+          path = _currentPath;
+        }
+        painter->fillPath(path, QBrush(hoverColor));
+      }
     }
     if (isSelected()) {
         if (QtAnnotation::annotationColorForRects) {
@@ -291,4 +305,13 @@ bool PolyQtAnnotation::contains(const QPointF & point) const {
 
 QPointF PolyQtAnnotation::getLastClickedLinePoint() {
   return _lastClickedLinePoint;
+}
+
+void PolyQtAnnotation::setHover(bool hover) {
+  _hovered = hover;
+  update();
+}
+
+bool PolyQtAnnotation::isHovered() const {
+  return _hovered;
 }

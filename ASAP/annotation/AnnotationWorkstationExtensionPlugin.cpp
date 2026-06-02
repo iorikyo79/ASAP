@@ -2,6 +2,7 @@
 #include "DotAnnotationTool.h"
 #include "PolyAnnotationTool.h"
 #include "YellowPolyAnnotationTool.h"
+#include "ClassToggleTool.h"
 #include "PointSetAnnotationTool.h"
 #include "SplineAnnotationTool.h"
 #include "AnnotationUndoCommands.h"
@@ -971,6 +972,8 @@ bool AnnotationWorkstationExtensionPlugin::initialize(PathologyViewer* viewer) {
   tool.reset(new PolyAnnotationTool(this, viewer));
   _annotationTools.push_back(tool);
   tool.reset(new YellowPolyAnnotationTool(this, viewer));
+  _annotationTools.push_back(tool);
+  tool.reset(new ClassToggleTool(this, viewer));
   _annotationTools.push_back(tool);
   tool.reset(new SplineAnnotationTool(this, viewer));
   _annotationTools.push_back(tool);

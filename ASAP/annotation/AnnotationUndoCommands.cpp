@@ -293,3 +293,70 @@ void DeleteAnnotationCommand::undo() {
   _plugin->_treeWidget->resizeColumnToContents(0);
   _plugin->_treeWidget->resizeColumnToContents(1);
 }
+
+// ============================================================================
+// SetAnnotationColorCommand
+// ============================================================================
+
+SetAnnotationColorCommand::SetAnnotationColorCommand(
+  QtAnnotation* annotation, const std::string& newColor,
+  AnnotationWorkstationExtensionPlugin* plugin, QUndoCommand* parent)
+  : QUndoCommand(parent), _annotation(annotation), _newColor(newColor), _plugin(plugin) {
+  _oldColor = _annotation->getAnnotation()->getColor();
+}
+
+void SetAnnotationColorCommand::redo() {
+  _annotation->getAnnotation()->setColor(_newColor);
+
+  QMap<QtAnnotation*, QTreeWidgetItem*>::iterator it = _plugin->_annotToItem.find(_annotation);
+  if (it != _plugin->_annotToItem.end()) {
+    QTreeWidgetItem* item = it.value();
+
+    QColor newColor(QString::fromStdString(_newColor));
+    int cHeight = _plugin->_treeWidget->visualItemRect(item).height());
+    if (_plugin->_treeWidget->topLevelItemCount() > 0) {
+      cHeight = _plugin->_treeWidget->visualItemRect(_plugin->_treeWidget->topLevelItem(0)).height();
+    }
+    QPixmap iconPM(cHeight, cHeight);
+    iconPM.fill(newColor);
+    QIcon icon(iconPM);
+    item->setIcon(0, icon);
+    item->setData(0, Qt::UserRole, newColor);
+
+    _plugin->_treeWidget->resizeColumnToContents(0);
+    _plugin->_treeWidget->resizeColumnToContents(1);
+  }
+
+  _annotation->update();
+  if (_annotation->scene()) {
+    _annotation->scene()->update();
+  }
+}
+
+void SetAnnotationColorCommand::undo() {
+  _annotation->getAnnotation()->setColor(_oldColor);
+
+  QMap<QtAnnotation*, QTreeWidgetItem*>::iterator it = _plugin->_annotToItem.find(_annotation);
+  if (it != _plugin->_annotToItem.end()) {
+    QTreeWidgetItem* item = it.value();
+
+    QColor oldColor(QString::fromStdString(_oldColor));
+    int cHeight = _plugin->_treeWidget->visualItemRect(item).height());
+    if (_plugin->_treeWidget->topLevelItemCount() > 0) {
+      cHeight = _plugin->_treeWidget->visualItemRect(_plugin->_treeWidget->topLevelItem(0)).height();
+    }
+    QPixmap iconPM(cHeight, cHeight);
+    iconPM.fill(oldColor);
+    QIcon icon(iconPM);
+    item->setIcon(0, icon);
+    item->setData(0, Qt::UserRole, oldColor);
+
+    _plugin->_treeWidget->resizeColumnToContents(0);
+    _plugin->_treeWidget->resizeColumnToContents(1);
+  }
+
+  _annotation->update();
+  if (_annotation->scene()) {
+    _annotation->scene()->update();
+  }
+}

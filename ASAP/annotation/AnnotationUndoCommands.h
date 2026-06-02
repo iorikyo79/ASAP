@@ -5,6 +5,9 @@
 #include <QTreeWidgetItem>
 #include <QColor>
 #include <QString>
+#include <QMap>
+#include <QPixmap>
+#include <QIcon>
 #include <memory>
 #include "core/Point.h"
 
@@ -78,6 +81,19 @@ private:
   AnnotationWorkstationExtensionPlugin* _plugin;
   QtAnnotation* _annotation;
   bool _removed;
+};
+
+class SetAnnotationColorCommand : public QUndoCommand {
+public:
+  SetAnnotationColorCommand(QtAnnotation* annotation, const std::string& newColor,
+    AnnotationWorkstationExtensionPlugin* plugin, QUndoCommand* parent = nullptr);
+  void undo() override;
+  void redo() override;
+private:
+  QtAnnotation* _annotation;
+  std::string _oldColor;
+  std::string _newColor;
+  AnnotationWorkstationExtensionPlugin* _plugin;
 };
 
 #endif // ANNOTATIONUNDOCOMMANDS_H

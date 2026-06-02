@@ -8,6 +8,7 @@ SET(ANNOTATION_PLUGIN_HEADERS
     DotAnnotationTool.h
     PolyAnnotationTool.h
     YellowPolyAnnotationTool.h
+    ClassToggleTool.h
     MeasurementAnnotationTool.h
     RectangleAnnotationTool.h
     PointSetAnnotationTool.h
@@ -29,6 +30,7 @@ SET(ANNOTATION_PLUGIN_SOURCE
     DotAnnotationTool.cpp
     PolyAnnotationTool.cpp
     YellowPolyAnnotationTool.cpp
+    ClassToggleTool.cpp
     PointSetAnnotationTool.cpp
     SplineAnnotationTool.cpp
     QtAnnotation.cpp
