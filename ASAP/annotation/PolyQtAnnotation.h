@@ -9,6 +9,7 @@ class ANNOTATIONPLUGIN_EXPORT PolyQtAnnotation : public QtAnnotation
 {
   Q_OBJECT
 public:
+  enum { Type = UserType + 101 };
   PolyQtAnnotation(const std::shared_ptr<Annotation>& annotation, QObject *parent, float scale = 1.0);
   QRectF boundingRect() const;
 
@@ -24,6 +25,8 @@ public:
   QPointF getLastClickedLinePoint();
   void setHover(bool hover);
   bool isHovered() const;
+
+  int type() const override { return Type; }
 
 private:
   QColor _rectColor;

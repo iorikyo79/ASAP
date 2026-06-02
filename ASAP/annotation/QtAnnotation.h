@@ -15,6 +15,7 @@ class ANNOTATIONPLUGIN_EXPORT QtAnnotation : public QObject, public QGraphicsIte
   Q_OBJECT
   Q_INTERFACES(QGraphicsItem)
 public:
+  enum { Type = UserType + 100 };
   QtAnnotation(const std::shared_ptr<Annotation>& annotation, QObject* parent, float scale = 1.);
   virtual ~QtAnnotation();
   void addCoordinate(const float& x, const float& y);
@@ -47,6 +48,8 @@ public:
   bool getEditable() const;
 
   QColor getDrawingColor();
+
+  virtual int type() const override { return Type; }
 
 signals:
   void annotationChanged(QtAnnotation* annotation);

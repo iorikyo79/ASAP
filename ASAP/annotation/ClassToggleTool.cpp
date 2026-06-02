@@ -70,55 +70,44 @@ void ClassToggleTool::mousePressEvent(QMouseEvent* event) {
     writeLog(QString("Found %1 items at click position").arg(items.size()));
 
     for (QGraphicsItem* item : items) {
-      QString itemData = item->data(0).toString();
-      qDebug() << "[ClassToggleTool] item->data(0):" << itemData;
-      writeLog("item->data(0): " + itemData);
-      if (itemData == "QtAnnotation") {
-        QtAnnotation* clicked = static_cast<QtAnnotation*>(item);
-        qDebug() << "[ClassToggleTool] Found QtAnnotation";
-        writeLog("Found QtAnnotation");
-        PolyQtAnnotation* polyAnnotation = dynamic_cast<PolyQtAnnotation*>(clicked);
-        if (polyAnnotation) {
-          qDebug() << "[ClassToggleTool] Found PolyQtAnnotation, checking if click is inside...";
-          writeLog("Found PolyQtAnnotation, checking if click is inside...");
-          if (polyAnnotation->contains(scenePos)) {
-            qDebug() << "[ClassToggleTool] Click is INSIDE polygon";
-            writeLog("Click is INSIDE polygon");
-            std::string currentColor = clicked->getAnnotation()->getColor();
-            QString colorStr = QString::fromStdString(currentColor);
-            qDebug() << "[ClassToggleTool] Current color:" << colorStr;
-            writeLog("Current color: " + colorStr);
+      int itemType = item->type();
+      qDebug() << "[ClassToggleTool] item->type():" << itemType;
+      writeLog(QString("item->type(): %1").arg(itemType));
+      if (itemType == QGraphicsItem::UserType + 101) {  // PolyQtAnnotation::Type
+        PolyQtAnnotation* polyAnnotation = static_cast<PolyQtAnnotation*>(item);
+        qDebug() << "[ClassToggleTool] Found PolyQtAnnotation, checking if click is inside...";
+        writeLog("Found PolyQtAnnotation, checking if click is inside...");
+        if (polyAnnotation->contains(scenePos)) {
+          qDebug() << "[ClassToggleTool] Click is INSIDE polygon";
+          writeLog("Click is INSIDE polygon");
+          std::string currentColor = polyAnnotation->getAnnotation()->getColor();
+          QString colorStr = QString::fromStdString(currentColor);
+          qDebug() << "[ClassToggleTool] Current color:" << colorStr;
+          writeLog("Current color: " + colorStr);
 
-            const std::string yellowColor = "#F4FA58";
-            const std::string polyColor = "#0000FF";
+          const std::string yellowColor = "#F4FA58";
+          const std::string polyColor = "#0000FF";
 
-            std::string newColor = (currentColor == yellowColor) ? polyColor : yellowColor;
-            QString newColorStr = QString::fromStdString(newColor);
-            qDebug() << "[ClassToggleTool] New color will be:" << newColorStr;
-            writeLog("New color will be: " + newColorStr);
+          std::string newColor = (currentColor == yellowColor) ? polyColor : yellowColor;
+          QString newColorStr = QString::fromStdString(newColor);
+          qDebug() << "[ClassToggleTool] New color will be:" << newColorStr;
+          writeLog("New color will be: " + newColorStr);
 
-            if (currentColor != newColor) {
-              qDebug() << "[ClassToggleTool] Pushing SetAnnotationColorCommand to undo stack";
-              writeLog("Pushing SetAnnotationColorCommand to undo stack");
-              _annotationPlugin->undoStack()->push(
-                new SetAnnotationColorCommand(clicked, newColor, _annotationPlugin));
-            } else {
-              qDebug() << "[ClassToggleTool] Current color equals new color, skipping command";
-              writeLog("Current color equals new color, skipping command");
-            }
-            event->accept();
-            return;
+          if (currentColor != newColor) {
+            qDebug() << "[ClassToggleTool] Pushing SetAnnotationColorCommand to undo stack";
+            writeLog("Pushing SetAnnotationColorCommand to undo stack");
+            _annotationPlugin->undoStack()->push(
+              new SetAnnotationColorCommand(polyAnnotation, newColor, _annotationPlugin));
           } else {
-            qDebug() << "[ClassToggleTool] Click is OUTSIDE polygon";
-            writeLog("Click is OUTSIDE polygon");
+            qDebug() << "[ClassToggleTool] Current color equals new color, skipping command";
+            writeLog("Current color equals new color, skipping command");
           }
+          event->accept();
+          return;
         } else {
-          qDebug() << "[ClassToggleTool] Item is not a PolyQtAnnotation";
-          writeLog("Item is not a PolyQtAnnotation");
+          qDebug() << "[ClassToggleTool] Click is OUTSIDE polygon";
+          writeLog("Click is OUTSIDE polygon");
         }
-      } else {
-        qDebug() << "[ClassToggleTool] Item is not a QtAnnotation";
-        writeLog("Item is not a QtAnnotation");
       }
     }
     qDebug() << "[ClassToggleTool] No valid polygon clicked at this position";
@@ -148,10 +137,9 @@ void ClassToggleTool::mouseMoveEvent(QMouseEvent* event) {
     if (hoverMaskEnabled) {
       QList<QGraphicsItem*> items = _viewer->scene()->items(scenePos);
       for (QGraphicsItem* item : items) {
-        if (item->data(0).toString() == "QtAnnotation") {
-          QtAnnotation* qtAnnotation = static_cast<QtAnnotation*>(item);
-          PolyQtAnnotation* polyAnnotation = dynamic_cast<PolyQtAnnotation*>(qtAnnotation);
-          if (polyAnnotation && polyAnnotation->contains(scenePos)) {
+        if (item->type() == QGraphicsItem::UserType + 101) {  // PolyQtAnnotation::Type
+          PolyQtAnnotation* polyAnnotation = static_cast<PolyQtAnnotation*>(item);
+          if (polyAnnotation->contains(scenePos)) {
             qDebug() << "[ClassToggleTool] Hovering over polygon";
             writeLog("Hovering over polygon");
             _hoveredAnnotation = polyAnnotation;
