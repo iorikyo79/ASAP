@@ -113,32 +113,33 @@ void ClassToggleTool::mousePressEvent(QMouseEvent* event) {
       if (polyAnnotation) {
         QPointF localPos = polyAnnotation->mapFromScene(scenePos);
         if (polyAnnotation->contains(localPos)) {
-        qDebug() << "[ClassToggleTool] Found clicked polygon";
-        writeLog("Found clicked polygon");
-        std::string currentColor = polyAnnotation->getAnnotation()->getColor();
-        QString colorStr = QString::fromStdString(currentColor);
-        qDebug() << "[ClassToggleTool] Current color:" << colorStr;
-        writeLog("Current color: " + colorStr);
+          qDebug() << "[ClassToggleTool] Found clicked polygon";
+          writeLog("Found clicked polygon");
+          std::string currentColor = polyAnnotation->getAnnotation()->getColor();
+          QString colorStr = QString::fromStdString(currentColor);
+          qDebug() << "[ClassToggleTool] Current color:" << colorStr;
+          writeLog("Current color: " + colorStr);
 
-        const std::string yellowColor = "#F4FA58";
-        const std::string polyColor = "#0000FF";
+          const std::string yellowColor = "#F4FA58";
+          const std::string polyColor = "#0000FF";
 
-        std::string newColor = (currentColor == yellowColor) ? polyColor : yellowColor;
-        QString newColorStr = QString::fromStdString(newColor);
-        qDebug() << "[ClassToggleTool] New color will be:" << newColorStr;
-        writeLog("New color will be: " + newColorStr);
+          std::string newColor = (currentColor == yellowColor) ? polyColor : yellowColor;
+          QString newColorStr = QString::fromStdString(newColor);
+          qDebug() << "[ClassToggleTool] New color will be:" << newColorStr;
+          writeLog("New color will be: " + newColorStr);
 
-        if (currentColor != newColor) {
-          qDebug() << "[ClassToggleTool] Pushing SetAnnotationColorCommand to undo stack";
-          writeLog("Pushing SetAnnotationColorCommand to undo stack");
-          _annotationPlugin->undoStack()->push(
-            new SetAnnotationColorCommand(polyAnnotation, newColor, _annotationPlugin));
-        } else {
-          qDebug() << "[ClassToggleTool] Current color equals new color, skipping command";
-          writeLog("Current color equals new color, skipping command");
+          if (currentColor != newColor) {
+            qDebug() << "[ClassToggleTool] Pushing SetAnnotationColorCommand to undo stack";
+            writeLog("Pushing SetAnnotationColorCommand to undo stack");
+            _annotationPlugin->undoStack()->push(
+              new SetAnnotationColorCommand(polyAnnotation, newColor, _annotationPlugin));
+          } else {
+            qDebug() << "[ClassToggleTool] Current color equals new color, skipping command";
+            writeLog("Current color equals new color, skipping command");
+          }
+          event->accept();
+          return;
         }
-        event->accept();
-        return;
       }
     }
     qDebug() << "[ClassToggleTool] No valid polygon clicked at this position";
@@ -172,12 +173,13 @@ void ClassToggleTool::mouseMoveEvent(QMouseEvent* event) {
         if (polyAnnotation) {
           QPointF localPos = polyAnnotation->mapFromScene(scenePos);
           if (polyAnnotation->contains(localPos)) {
-          qDebug() << "[ClassToggleTool] Hovering over polygon";
-          writeLog("Hovering over polygon");
-          _hoveredAnnotation = polyAnnotation;
-          polyAnnotation->setHover(true);
-          _viewer->scene()->update();
-          break;
+            qDebug() << "[ClassToggleTool] Hovering over polygon";
+            writeLog("Hovering over polygon");
+            _hoveredAnnotation = polyAnnotation;
+            polyAnnotation->setHover(true);
+            _viewer->scene()->update();
+            break;
+          }
         }
       }
     }
