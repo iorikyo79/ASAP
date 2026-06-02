@@ -98,9 +98,11 @@ void ClassToggleTool::mousePressEvent(QMouseEvent* event) {
             writeLog(QString("  ... and %1 more points").arg(coords.size() - 10));
           }
 
-          bool contains = polyAnnotation->contains(scenePos);
-          qDebug() << "[ClassToggleTool] Annotation" << i << "contains click:" << contains;
-          writeLog(QString("Annotation %1 contains click: %2").arg(i).arg(contains ? "true" : "false"));
+          QPointF localPos = polyAnnotation->mapFromScene(scenePos);
+          bool contains = polyAnnotation->contains(localPos);
+          qDebug() << "[ClassToggleTool] Annotation" << i << "localPos:" << localPos << "contains:" << contains;
+          writeLog(QString("Annotation %1 localPos: (%2, %3) contains: %4")
+                   .arg(i).arg(localPos.x()).arg(localPos.y()).arg(contains ? "true" : "false"));
         }
       }
     }
@@ -108,7 +110,9 @@ void ClassToggleTool::mousePressEvent(QMouseEvent* event) {
     // 두 번째 루프: 실제 처리
     for (QtAnnotation* annot : annotations) {
       PolyQtAnnotation* polyAnnotation = dynamic_cast<PolyQtAnnotation*>(annot);
-      if (polyAnnotation && polyAnnotation->contains(scenePos)) {
+      if (polyAnnotation) {
+        QPointF localPos = polyAnnotation->mapFromScene(scenePos);
+        if (polyAnnotation->contains(localPos)) {
         qDebug() << "[ClassToggleTool] Found clicked polygon";
         writeLog("Found clicked polygon");
         std::string currentColor = polyAnnotation->getAnnotation()->getColor();
@@ -165,7 +169,9 @@ void ClassToggleTool::mouseMoveEvent(QMouseEvent* event) {
       QList<QtAnnotation*> annotations = _annotationPlugin->getQtAnnotations();
       for (QtAnnotation* annot : annotations) {
         PolyQtAnnotation* polyAnnotation = dynamic_cast<PolyQtAnnotation*>(annot);
-        if (polyAnnotation && polyAnnotation->contains(scenePos)) {
+        if (polyAnnotation) {
+          QPointF localPos = polyAnnotation->mapFromScene(scenePos);
+          if (polyAnnotation->contains(localPos)) {
           qDebug() << "[ClassToggleTool] Hovering over polygon";
           writeLog("Hovering over polygon");
           _hoveredAnnotation = polyAnnotation;
