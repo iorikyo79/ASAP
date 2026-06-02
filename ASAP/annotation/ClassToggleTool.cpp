@@ -68,54 +68,29 @@ void ClassToggleTool::mousePressEvent(QMouseEvent* event) {
     qDebug() << "[ClassToggleTool] scenePos (scene):" << scenePos;
     writeLog("scenePos (scene): " + QString("(%1, %2)").arg(scenePos.x()).arg(scenePos.y()));
 
-    QList<QtAnnotation*> annotations = _annotationPlugin->getQtAnnotations();
-    qDebug() << "[ClassToggleTool] Total annotations:" << annotations.size();
-    writeLog(QString("Total annotations: %1").arg(annotations.size()));
+    QList<QGraphicsItem*> items = _viewer->scene()->items(scenePos);
+    qDebug() << "[ClassToggleTool] Found" << items.size() << "items at click position";
+    writeLog(QString("Found %1 items at click position").arg(items.size()));
 
-    for (int i = 0; i < annotations.size(); ++i) {
-      QtAnnotation* annot = annotations[i];
-      PolyQtAnnotation* polyAnnotation = dynamic_cast<PolyQtAnnotation*>(annot);
+    for (QGraphicsItem* item : items) {
+      int itemType = item->type();
+      qDebug() << "[ClassToggleTool] item->type():" << itemType;
 
-      if (polyAnnotation) {
-        // 좌표계 통일: scene 좌표계로 변환
-        std::shared_ptr<Annotation> annotation = polyAnnotation->getAnnotation();
-        if (annotation) {
-          std::vector<Point> coords = annotation->getCoordinates();
-          QString coordStr = QString("Annotation %1 coords (scene): ").arg(i);
-          qDebug() << "[ClassToggleTool] Annotation" << i << "has" << coords.size() << "coordinates";
-          writeLog(coordStr);
+      if (itemType >= QGraphicsItem::UserType + 100 && itemType <= QGraphicsItem::UserType + 150) {
+        QtAnnotation* annot = reinterpret_cast<QtAnnotation*>(reinterpret_cast<QObject*>(item));
+        PolyQtAnnotation* polyAnnotation = dynamic_cast<PolyQtAnnotation*>(annot);
 
-          for (size_t j = 0; j < coords.size() && j < 10; ++j) {  // 최대 10개만 출력
-            Point coord = coords[j];
-            // 좌표는 getSceneScale()을 고려해야 scene 좌표계로 변환
-            float sceneX = coord.getX() * _viewer->getSceneScale();
-            float sceneY = coord.getY() * _viewer->getSceneScale();
-            QString pt = QString("  [%1]: (%2, %3)").arg(j).arg(sceneX).arg(sceneY);
-            qDebug() << "[ClassToggleTool]" << pt;
-            writeLog(pt);
-          }
-          if (coords.size() > 10) {
-            writeLog(QString("  ... and %1 more points").arg(coords.size() - 10));
-          }
-
+        if (polyAnnotation) {
           QPointF localPos = polyAnnotation->mapFromScene(scenePos);
           bool contains = polyAnnotation->contains(localPos);
-          qDebug() << "[ClassToggleTool] Annotation" << i << "localPos:" << localPos << "contains:" << contains;
-          writeLog(QString("Annotation %1 localPos: (%2, %3) contains: %4")
-                   .arg(i).arg(localPos.x()).arg(localPos.y()).arg(contains ? "true" : "false"));
-        }
-      }
-    }
+          qDebug() << "[ClassToggleTool] localPos:" << localPos << "contains:" << contains;
+          writeLog(QString("localPos: (%1, %2) contains: %3")
+                   .arg(localPos.x()).arg(localPos.y()).arg(contains ? "true" : "false"));
 
-    // 두 번째 루프: 실제 처리
-    for (QtAnnotation* annot : annotations) {
-      PolyQtAnnotation* polyAnnotation = dynamic_cast<PolyQtAnnotation*>(annot);
-      if (polyAnnotation) {
-        QPointF localPos = polyAnnotation->mapFromScene(scenePos);
-        if (polyAnnotation->contains(localPos)) {
-          qDebug() << "[ClassToggleTool] Found clicked polygon";
-          writeLog("Found clicked polygon");
-          std::string currentColor = polyAnnotation->getAnnotation()->getColor();
+          if (contains) {
+            qDebug() << "[ClassToggleTool] Found clicked polygon";
+            writeLog("Found clicked polygon");
+            std::string currentColor = polyAnnotation->getAnnotation()->getColor();
           QString colorStr = QString::fromStdString(currentColor);
           qDebug() << "[ClassToggleTool] Current color:" << colorStr;
           writeLog("Current color: " + colorStr);
@@ -167,18 +142,22 @@ void ClassToggleTool::mouseMoveEvent(QMouseEvent* event) {
     writeLog("mouseMoveEvent - hoverMaskEnabled: " + QString(hoverMaskEnabled ? "true" : "false"));
 
     if (hoverMaskEnabled) {
-      QList<QtAnnotation*> annotations = _annotationPlugin->getQtAnnotations();
-      for (QtAnnotation* annot : annotations) {
-        PolyQtAnnotation* polyAnnotation = dynamic_cast<PolyQtAnnotation*>(annot);
-        if (polyAnnotation) {
-          QPointF localPos = polyAnnotation->mapFromScene(scenePos);
-          if (polyAnnotation->contains(localPos)) {
-            qDebug() << "[ClassToggleTool] Hovering over polygon";
-            writeLog("Hovering over polygon");
-            _hoveredAnnotation = polyAnnotation;
-            polyAnnotation->setHover(true);
-            _viewer->scene()->update();
-            break;
+      QList<QGraphicsItem*> items = _viewer->scene()->items(scenePos);
+      for (QGraphicsItem* item : items) {
+        int itemType = item->type();
+        if (itemType >= QGraphicsItem::UserType + 100 && itemType <= QGraphicsItem::UserType + 150) {
+          QtAnnotation* annot = reinterpret_cast<QtAnnotation*>(reinterpret_cast<QObject*>(item));
+          PolyQtAnnotation* polyAnnotation = dynamic_cast<PolyQtAnnotation*>(annot);
+          if (polyAnnotation) {
+            QPointF localPos = polyAnnotation->mapFromScene(scenePos);
+            if (polyAnnotation->contains(localPos)) {
+              qDebug() << "[ClassToggleTool] Hovering over polygon";
+              writeLog("Hovering over polygon");
+              _hoveredAnnotation = polyAnnotation;
+              polyAnnotation->setHover(true);
+              _viewer->scene()->update();
+              break;
+            }
           }
         }
       }
