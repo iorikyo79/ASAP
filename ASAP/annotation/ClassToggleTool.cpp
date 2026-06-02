@@ -60,15 +60,52 @@ void ClassToggleTool::mousePressEvent(QMouseEvent* event) {
   writeLog("mousePressEvent triggered");
 
   if (_viewer) {
-    QPointF scenePos = _viewer->mapToScene(event->pos());
-    QString posStr = QString("(%1, %2)").arg(scenePos.x()).arg(scenePos.y());
-    qDebug() << "[ClassToggleTool] scenePos:" << scenePos;
-    writeLog("scenePos: " + posStr);
+    QPointF clickPos = event->pos();
+    QPointF scenePos = _viewer->mapToScene(clickPos);
+
+    qDebug() << "[ClassToggleTool] clickPos (widget):" << clickPos;
+    writeLog("clickPos (widget): " + QString("(%1, %2)").arg(clickPos.x()).arg(clickPos.y()));
+    qDebug() << "[ClassToggleTool] scenePos (scene):" << scenePos;
+    writeLog("scenePos (scene): " + QString("(%1, %2)").arg(scenePos.x()).arg(scenePos.y()));
 
     QList<QtAnnotation*> annotations = _annotationPlugin->getQtAnnotations();
     qDebug() << "[ClassToggleTool] Total annotations:" << annotations.size();
     writeLog(QString("Total annotations: %1").arg(annotations.size()));
 
+    for (int i = 0; i < annotations.size(); ++i) {
+      QtAnnotation* annot = annotations[i];
+      PolyQtAnnotation* polyAnnotation = dynamic_cast<PolyQtAnnotation*>(annot);
+
+      if (polyAnnotation) {
+        // 좌표계 통일: scene 좌표계로 변환
+        std::shared_ptr<Annotation> annotation = polyAnnotation->getAnnotation();
+        if (annotation) {
+          std::vector<Point> coords = annotation->getCoordinates();
+          QString coordStr = QString("Annotation %1 coords (scene): ").arg(i);
+          qDebug() << "[ClassToggleTool] Annotation" << i << "has" << coords.size() << "coordinates";
+          writeLog(coordStr);
+
+          for (size_t j = 0; j < coords.size() && j < 10; ++j) {  // 최대 10개만 출력
+            Point coord = coords[j];
+            // 좌표는 getSceneScale()을 고려해야 scene 좌표계로 변환
+            float sceneX = coord.getX() * _viewer->getSceneScale();
+            float sceneY = coord.getY() * _viewer->getSceneScale();
+            QString pt = QString("  [%1]: (%2, %3)").arg(j).arg(sceneX).arg(sceneY);
+            qDebug() << "[ClassToggleTool]" << pt;
+            writeLog(pt);
+          }
+          if (coords.size() > 10) {
+            writeLog(QString("  ... and %1 more points").arg(coords.size() - 10));
+          }
+
+          bool contains = polyAnnotation->contains(scenePos);
+          qDebug() << "[ClassToggleTool] Annotation" << i << "contains click:" << contains;
+          writeLog(QString("Annotation %1 contains click: %2").arg(i).arg(contains ? "true" : "false"));
+        }
+      }
+    }
+
+    // 두 번째 루프: 실제 처리
     for (QtAnnotation* annot : annotations) {
       PolyQtAnnotation* polyAnnotation = dynamic_cast<PolyQtAnnotation*>(annot);
       if (polyAnnotation && polyAnnotation->contains(scenePos)) {
