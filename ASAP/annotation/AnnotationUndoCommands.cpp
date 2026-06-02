@@ -313,7 +313,7 @@ void SetAnnotationColorCommand::redo() {
     QTreeWidgetItem* item = it.value();
 
     QColor newCol(QString::fromStdString(_newColor));
-    int cHeight = _plugin->_treeWidget->visualItemRect(item).height());
+    int cHeight = _plugin->_treeWidget->visualItemRect(item).height();
     if (_plugin->_treeWidget->topLevelItemCount() > 0) {
       cHeight = _plugin->_treeWidget->visualItemRect(_plugin->_treeWidget->topLevelItem(0)).height();
     }
@@ -341,7 +341,7 @@ void SetAnnotationColorCommand::undo() {
     QTreeWidgetItem* item = it.value();
 
     QColor oldCol(QString::fromStdString(_oldColor));
-    int cHeight = _plugin->_treeWidget->visualItemRect(item).height());
+    int cHeight = _plugin->_treeWidget->visualItemRect(item).height();
     if (_plugin->_treeWidget->topLevelItemCount() > 0) {
       cHeight = _plugin->_treeWidget->visualItemRect(_plugin->_treeWidget->topLevelItem(0)).height();
     }
