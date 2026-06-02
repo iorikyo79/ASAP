@@ -43,6 +43,7 @@ public :
     QDockWidget* getDockWidget();
     QtAnnotation* getActiveAnnotation();
     QtAnnotation* getGeneratedAnnotation();
+    QList<QtAnnotation*> getQtAnnotations() const;
     QSet<QtAnnotation*> getSelectedAnnotations();
     void addAnnotationToSelection(QtAnnotation* annotation);
     void removeAnnotationFromSelection(QtAnnotation* annotation);

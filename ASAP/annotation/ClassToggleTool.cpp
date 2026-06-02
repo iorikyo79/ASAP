@@ -65,44 +65,39 @@ void ClassToggleTool::mousePressEvent(QMouseEvent* event) {
     qDebug() << "[ClassToggleTool] scenePos:" << scenePos;
     writeLog("scenePos: " + posStr);
 
-    QList<QGraphicsItem*> items = _viewer->scene()->items(scenePos);
-    qDebug() << "[ClassToggleTool] Found" << items.size() << "items at click position";
-    writeLog(QString("Found %1 items at click position").arg(items.size()));
+    QList<QtAnnotation*> annotations = _annotationPlugin->getQtAnnotations();
+    qDebug() << "[ClassToggleTool] Total annotations:" << annotations.size();
+    writeLog(QString("Total annotations: %1").arg(annotations.size()));
 
-    for (QGraphicsItem* item : items) {
-      int itemType = item->type();
-      if (itemType >= QGraphicsItem::UserType + 100 && itemType <= QGraphicsItem::UserType + 150) {
-        QtAnnotation* qtAnnotation = reinterpret_cast<QtAnnotation*>(reinterpret_cast<QObject*>(item));
-        PolyQtAnnotation* polyAnnotation = dynamic_cast<PolyQtAnnotation*>(qtAnnotation);
-        if (polyAnnotation && polyAnnotation->contains(scenePos)) {
-          std::string currentColor = polyAnnotation->getAnnotation()->getColor();
-          QString colorStr = QString::fromStdString(currentColor);
-          qDebug() << "[ClassToggleTool] Current color:" << colorStr;
-          writeLog("Current color: " + colorStr);
+    for (QtAnnotation* annot : annotations) {
+      PolyQtAnnotation* polyAnnotation = dynamic_cast<PolyQtAnnotation*>(annot);
+      if (polyAnnotation && polyAnnotation->contains(scenePos)) {
+        qDebug() << "[ClassToggleTool] Found clicked polygon";
+        writeLog("Found clicked polygon");
+        std::string currentColor = polyAnnotation->getAnnotation()->getColor();
+        QString colorStr = QString::fromStdString(currentColor);
+        qDebug() << "[ClassToggleTool] Current color:" << colorStr;
+        writeLog("Current color: " + colorStr);
 
-          const std::string yellowColor = "#F4FA58";
-          const std::string polyColor = "#0000FF";
+        const std::string yellowColor = "#F4FA58";
+        const std::string polyColor = "#0000FF";
 
-          std::string newColor = (currentColor == yellowColor) ? polyColor : yellowColor;
-          QString newColorStr = QString::fromStdString(newColor);
-          qDebug() << "[ClassToggleTool] New color will be:" << newColorStr;
-          writeLog("New color will be: " + newColorStr);
+        std::string newColor = (currentColor == yellowColor) ? polyColor : yellowColor;
+        QString newColorStr = QString::fromStdString(newColor);
+        qDebug() << "[ClassToggleTool] New color will be:" << newColorStr;
+        writeLog("New color will be: " + newColorStr);
 
-          if (currentColor != newColor) {
-            qDebug() << "[ClassToggleTool] Pushing SetAnnotationColorCommand to undo stack";
-            writeLog("Pushing SetAnnotationColorCommand to undo stack");
-            _annotationPlugin->undoStack()->push(
-              new SetAnnotationColorCommand(polyAnnotation, newColor, _annotationPlugin));
-          } else {
-            qDebug() << "[ClassToggleTool] Current color equals new color, skipping command";
-            writeLog("Current color equals new color, skipping command");
-          }
-          event->accept();
-          return;
+        if (currentColor != newColor) {
+          qDebug() << "[ClassToggleTool] Pushing SetAnnotationColorCommand to undo stack";
+          writeLog("Pushing SetAnnotationColorCommand to undo stack");
+          _annotationPlugin->undoStack()->push(
+            new SetAnnotationColorCommand(polyAnnotation, newColor, _annotationPlugin));
         } else {
-          qDebug() << "[ClassToggleTool] Click is OUTSIDE polygon";
-          writeLog("Click is OUTSIDE polygon");
+          qDebug() << "[ClassToggleTool] Current color equals new color, skipping command";
+          writeLog("Current color equals new color, skipping command");
         }
+        event->accept();
+        return;
       }
     }
     qDebug() << "[ClassToggleTool] No valid polygon clicked at this position";
@@ -130,20 +125,16 @@ void ClassToggleTool::mouseMoveEvent(QMouseEvent* event) {
     writeLog("mouseMoveEvent - hoverMaskEnabled: " + QString(hoverMaskEnabled ? "true" : "false"));
 
     if (hoverMaskEnabled) {
-      QList<QGraphicsItem*> items = _viewer->scene()->items(scenePos);
-      for (QGraphicsItem* item : items) {
-        int itemType = item->type();
-        if (itemType >= QGraphicsItem::UserType + 100 && itemType <= QGraphicsItem::UserType + 150) {
-          QtAnnotation* qtAnnotation = reinterpret_cast<QtAnnotation*>(reinterpret_cast<QObject*>(item));
-          PolyQtAnnotation* polyAnnotation = dynamic_cast<PolyQtAnnotation*>(qtAnnotation);
-          if (polyAnnotation && polyAnnotation->contains(scenePos)) {
-            qDebug() << "[ClassToggleTool] Hovering over polygon";
-            writeLog("Hovering over polygon");
-            _hoveredAnnotation = polyAnnotation;
-            polyAnnotation->setHover(true);
-            _viewer->scene()->update();
-            break;
-          }
+      QList<QtAnnotation*> annotations = _annotationPlugin->getQtAnnotations();
+      for (QtAnnotation* annot : annotations) {
+        PolyQtAnnotation* polyAnnotation = dynamic_cast<PolyQtAnnotation*>(annot);
+        if (polyAnnotation && polyAnnotation->contains(scenePos)) {
+          qDebug() << "[ClassToggleTool] Hovering over polygon";
+          writeLog("Hovering over polygon");
+          _hoveredAnnotation = polyAnnotation;
+          polyAnnotation->setHover(true);
+          _viewer->scene()->update();
+          break;
         }
       }
     }

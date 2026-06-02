@@ -1160,6 +1160,10 @@ QtAnnotation* AnnotationWorkstationExtensionPlugin::getActiveAnnotation() {
   return _activeAnnotation;
 }
 
+QList<QtAnnotation*> AnnotationWorkstationExtensionPlugin::getQtAnnotations() const {
+  return _qtAnnotations;
+}
+
 void AnnotationWorkstationExtensionPlugin::clearSelection() {
   if (_treeWidget) {
     _treeWidget->clearSelection();
