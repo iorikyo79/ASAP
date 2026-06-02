@@ -72,7 +72,7 @@ void ClassToggleTool::mousePressEvent(QMouseEvent* event) {
     for (QGraphicsItem* item : items) {
       int itemType = item->type();
       if (itemType >= QGraphicsItem::UserType + 100 && itemType <= QGraphicsItem::UserType + 150) {
-        QtAnnotation* qtAnnotation = static_cast<QtAnnotation*>(static_cast<QObject*>(item));
+        QtAnnotation* qtAnnotation = reinterpret_cast<QtAnnotation*>(reinterpret_cast<QObject*>(item));
         PolyQtAnnotation* polyAnnotation = dynamic_cast<PolyQtAnnotation*>(qtAnnotation);
         if (polyAnnotation && polyAnnotation->contains(scenePos)) {
           std::string currentColor = polyAnnotation->getAnnotation()->getColor();
@@ -134,7 +134,7 @@ void ClassToggleTool::mouseMoveEvent(QMouseEvent* event) {
       for (QGraphicsItem* item : items) {
         int itemType = item->type();
         if (itemType >= QGraphicsItem::UserType + 100 && itemType <= QGraphicsItem::UserType + 150) {
-          QtAnnotation* qtAnnotation = static_cast<QtAnnotation*>(static_cast<QObject*>(item));
+          QtAnnotation* qtAnnotation = reinterpret_cast<QtAnnotation*>(reinterpret_cast<QObject*>(item));
           PolyQtAnnotation* polyAnnotation = dynamic_cast<PolyQtAnnotation*>(qtAnnotation);
           if (polyAnnotation && polyAnnotation->contains(scenePos)) {
             qDebug() << "[ClassToggleTool] Hovering over polygon";
