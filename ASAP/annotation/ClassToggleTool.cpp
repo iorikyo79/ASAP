@@ -71,15 +71,10 @@ void ClassToggleTool::mousePressEvent(QMouseEvent* event) {
 
     for (QGraphicsItem* item : items) {
       int itemType = item->type();
-      qDebug() << "[ClassToggleTool] item->type():" << itemType;
-      writeLog(QString("item->type(): %1").arg(itemType));
-      if (itemType == QGraphicsItem::UserType + 101) {  // PolyQtAnnotation::Type
-        PolyQtAnnotation* polyAnnotation = static_cast<PolyQtAnnotation*>(item);
-        qDebug() << "[ClassToggleTool] Found PolyQtAnnotation, checking if click is inside...";
-        writeLog("Found PolyQtAnnotation, checking if click is inside...");
-        if (polyAnnotation->contains(scenePos)) {
-          qDebug() << "[ClassToggleTool] Click is INSIDE polygon";
-          writeLog("Click is INSIDE polygon");
+      if (itemType >= QGraphicsItem::UserType + 100 && itemType <= QGraphicsItem::UserType + 150) {
+        QtAnnotation* qtAnnotation = static_cast<QtAnnotation*>(static_cast<QObject*>(item));
+        PolyQtAnnotation* polyAnnotation = dynamic_cast<PolyQtAnnotation*>(qtAnnotation);
+        if (polyAnnotation && polyAnnotation->contains(scenePos)) {
           std::string currentColor = polyAnnotation->getAnnotation()->getColor();
           QString colorStr = QString::fromStdString(currentColor);
           qDebug() << "[ClassToggleTool] Current color:" << colorStr;
@@ -137,9 +132,11 @@ void ClassToggleTool::mouseMoveEvent(QMouseEvent* event) {
     if (hoverMaskEnabled) {
       QList<QGraphicsItem*> items = _viewer->scene()->items(scenePos);
       for (QGraphicsItem* item : items) {
-        if (item->type() == QGraphicsItem::UserType + 101) {  // PolyQtAnnotation::Type
-          PolyQtAnnotation* polyAnnotation = static_cast<PolyQtAnnotation*>(item);
-          if (polyAnnotation->contains(scenePos)) {
+        int itemType = item->type();
+        if (itemType >= QGraphicsItem::UserType + 100 && itemType <= QGraphicsItem::UserType + 150) {
+          QtAnnotation* qtAnnotation = static_cast<QtAnnotation*>(static_cast<QObject*>(item));
+          PolyQtAnnotation* polyAnnotation = dynamic_cast<PolyQtAnnotation*>(qtAnnotation);
+          if (polyAnnotation && polyAnnotation->contains(scenePos)) {
             qDebug() << "[ClassToggleTool] Hovering over polygon";
             writeLog("Hovering over polygon");
             _hoveredAnnotation = polyAnnotation;
