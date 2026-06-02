@@ -24,6 +24,7 @@ _lastClickedSecondCoordinateIndex(-1)
     this->setPos(center.getX()*_scale, center.getY()*_scale);
   }
   this->setFlag(QGraphicsItem::ItemIsSelectable);
+  setData(0, "QtAnnotation");
 }
 
 QtAnnotation::~QtAnnotation() {

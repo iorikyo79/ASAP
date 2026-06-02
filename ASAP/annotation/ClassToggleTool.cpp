@@ -70,8 +70,8 @@ void ClassToggleTool::mousePressEvent(QMouseEvent* event) {
     writeLog(QString("Found %1 items at click position").arg(items.size()));
 
     for (QGraphicsItem* item : items) {
-      QtAnnotation* clicked = qobject_cast<QtAnnotation*>(dynamic_cast<QObject*>(item));
-      if (clicked) {
+      if (item->data(0).toString() == "QtAnnotation") {
+        QtAnnotation* clicked = static_cast<QtAnnotation*>(item);
         qDebug() << "[ClassToggleTool] Found QtAnnotation";
         writeLog("Found QtAnnotation");
         PolyQtAnnotation* polyAnnotation = dynamic_cast<PolyQtAnnotation*>(clicked);
@@ -145,8 +145,8 @@ void ClassToggleTool::mouseMoveEvent(QMouseEvent* event) {
     if (hoverMaskEnabled) {
       QList<QGraphicsItem*> items = _viewer->scene()->items(scenePos);
       for (QGraphicsItem* item : items) {
-        QtAnnotation* qtAnnotation = qobject_cast<QtAnnotation*>(dynamic_cast<QObject*>(item));
-        if (qtAnnotation) {
+        if (item->data(0).toString() == "QtAnnotation") {
+          QtAnnotation* qtAnnotation = static_cast<QtAnnotation*>(item);
           PolyQtAnnotation* polyAnnotation = dynamic_cast<PolyQtAnnotation*>(qtAnnotation);
           if (polyAnnotation && polyAnnotation->contains(scenePos)) {
             qDebug() << "[ClassToggleTool] Hovering over polygon";
