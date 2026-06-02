@@ -312,16 +312,16 @@ void SetAnnotationColorCommand::redo() {
   if (it != _plugin->_annotToItem.end()) {
     QTreeWidgetItem* item = it.value();
 
-    QColor newColor(QString::fromStdString(_newColor));
+    QColor newCol(QString::fromStdString(_newColor));
     int cHeight = _plugin->_treeWidget->visualItemRect(item).height());
     if (_plugin->_treeWidget->topLevelItemCount() > 0) {
       cHeight = _plugin->_treeWidget->visualItemRect(_plugin->_treeWidget->topLevelItem(0)).height();
     }
     QPixmap iconPM(cHeight, cHeight);
-    iconPM.fill(newColor);
+    iconPM.fill(newCol);
     QIcon icon(iconPM);
     item->setIcon(0, icon);
-    item->setData(0, Qt::UserRole, newColor);
+    item->setData(0, Qt::UserRole, newCol);
 
     _plugin->_treeWidget->resizeColumnToContents(0);
     _plugin->_treeWidget->resizeColumnToContents(1);
@@ -340,16 +340,16 @@ void SetAnnotationColorCommand::undo() {
   if (it != _plugin->_annotToItem.end()) {
     QTreeWidgetItem* item = it.value();
 
-    QColor oldColor(QString::fromStdString(_oldColor));
+    QColor oldCol(QString::fromStdString(_oldColor));
     int cHeight = _plugin->_treeWidget->visualItemRect(item).height());
     if (_plugin->_treeWidget->topLevelItemCount() > 0) {
       cHeight = _plugin->_treeWidget->visualItemRect(_plugin->_treeWidget->topLevelItem(0)).height();
     }
     QPixmap iconPM(cHeight, cHeight);
-    iconPM.fill(oldColor);
+    iconPM.fill(oldCol);
     QIcon icon(iconPM);
     item->setIcon(0, icon);
-    item->setData(0, Qt::UserRole, oldColor);
+    item->setData(0, Qt::UserRole, oldCol);
 
     _plugin->_treeWidget->resizeColumnToContents(0);
     _plugin->_treeWidget->resizeColumnToContents(1);
