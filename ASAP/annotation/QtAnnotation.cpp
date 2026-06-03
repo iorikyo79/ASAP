@@ -24,7 +24,8 @@ _lastClickedSecondCoordinateIndex(-1)
     this->setPos(center.getX()*_scale, center.getY()*_scale);
   }
   this->setFlag(QGraphicsItem::ItemIsSelectable);
-  setData(0, "QtAnnotation");
+  quintptr ptr = reinterpret_cast<quintptr>(this);
+  setData(0, QVariant::fromValue(ptr));
 }
 
 QtAnnotation::~QtAnnotation() {

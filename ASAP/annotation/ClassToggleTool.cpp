@@ -72,20 +72,32 @@ void ClassToggleTool::mousePressEvent(QMouseEvent* event) {
     qDebug() << "[ClassToggleTool] Found" << items.size() << "items at click position";
     writeLog(QString("Found %1 items at click position").arg(items.size()));
 
-    for (QGraphicsItem* item : items) {
-      int itemType = item->type();
-      qDebug() << "[ClassToggleTool] item->type():" << itemType;
+    for (int i = 0; i < items.size(); ++i) {
+      QGraphicsItem* item = items[i];
+      QVariant data = item->data(0);
+      quintptr ptr = data.toULongLong();
 
-      if (itemType >= QGraphicsItem::UserType + 100 && itemType <= QGraphicsItem::UserType + 150) {
-        QtAnnotation* annot = reinterpret_cast<QtAnnotation*>(reinterpret_cast<QObject*>(item));
+      qDebug() << "[ClassToggleTool] Item" << i << "data(0):" << ptr;
+      writeLog(QString("Item %1 data(0): 0x%2").arg(i).arg(ptr, 0, 16));
+
+      if (ptr != 0) {
+        QtAnnotation* annot = reinterpret_cast<QtAnnotation*>(ptr);
+        qDebug() << "[ClassToggleTool] Cast to QtAnnotation*:" << annot;
+        writeLog(QString("Cast to QtAnnotation*: 0x%1").arg(reinterpret_cast<quintptr>(annot), 0, 16));
+
         PolyQtAnnotation* polyAnnotation = dynamic_cast<PolyQtAnnotation*>(annot);
+        qDebug() << "[ClassToggleTool] dynamic_cast to PolyQtAnnotation:" << polyAnnotation;
+        writeLog(QString("dynamic_cast to PolyQtAnnotation*: 0x%1")
+                 .arg(polyAnnotation ? reinterpret_cast<quintptr>(polyAnnotation) : 0, 0, 16));
 
         if (polyAnnotation) {
           QPointF localPos = polyAnnotation->mapFromScene(scenePos);
+          qDebug() << "[ClassToggleTool] localPos:" << localPos;
+          writeLog(QString("localPos: (%1, %2)").arg(localPos.x()).arg(localPos.y()));
+
           bool contains = polyAnnotation->contains(localPos);
-          qDebug() << "[ClassToggleTool] localPos:" << localPos << "contains:" << contains;
-          writeLog(QString("localPos: (%1, %2) contains: %3")
-                   .arg(localPos.x()).arg(localPos.y()).arg(contains ? "true" : "false"));
+          qDebug() << "[ClassToggleTool] contains:" << contains;
+          writeLog(QString("contains: %1").arg(contains ? "true" : "false"));
 
           if (contains) {
             qDebug() << "[ClassToggleTool] Found clicked polygon";
@@ -145,9 +157,11 @@ void ClassToggleTool::mouseMoveEvent(QMouseEvent* event) {
     if (hoverMaskEnabled) {
       QList<QGraphicsItem*> items = _viewer->scene()->items(scenePos);
       for (QGraphicsItem* item : items) {
-        int itemType = item->type();
-        if (itemType >= QGraphicsItem::UserType + 100 && itemType <= QGraphicsItem::UserType + 150) {
-          QtAnnotation* annot = reinterpret_cast<QtAnnotation*>(reinterpret_cast<QObject*>(item));
+        QVariant data = item->data(0);
+        quintptr ptr = data.toULongLong();
+
+        if (ptr != 0) {
+          QtAnnotation* annot = reinterpret_cast<QtAnnotation*>(ptr);
           PolyQtAnnotation* polyAnnotation = dynamic_cast<PolyQtAnnotation*>(annot);
           if (polyAnnotation) {
             QPointF localPos = polyAnnotation->mapFromScene(scenePos);
