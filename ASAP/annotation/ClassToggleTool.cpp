@@ -82,11 +82,11 @@ void ClassToggleTool::mousePressEvent(QMouseEvent* event) {
 
       if (ptr != 0) {
         QtAnnotation* annot = reinterpret_cast<QtAnnotation*>(ptr);
-        qDebug() << "[ClassToggleTool] Cast to QtAnnotation*:" << annot;
+        qDebug() << "[ClassToggleTool] Cast to QtAnnotation*:" << static_cast<void*>(annot);
         writeLog(QString("Cast to QtAnnotation*: 0x%1").arg(reinterpret_cast<quintptr>(annot), 0, 16));
 
         PolyQtAnnotation* polyAnnotation = dynamic_cast<PolyQtAnnotation*>(annot);
-        qDebug() << "[ClassToggleTool] dynamic_cast to PolyQtAnnotation:" << polyAnnotation;
+        qDebug() << "[ClassToggleTool] dynamic_cast to PolyQtAnnotation:" << static_cast<void*>(polyAnnotation);
         writeLog(QString("dynamic_cast to PolyQtAnnotation*: 0x%1")
                  .arg(polyAnnotation ? reinterpret_cast<quintptr>(polyAnnotation) : 0, 0, 16));
 
