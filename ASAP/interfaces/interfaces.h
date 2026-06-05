@@ -3,6 +3,8 @@
 
 #include <QtPlugin>
 #include <QMouseEvent>
+#include <QKeyEvent>
+#include <QWheelEvent>
 #include <QIcon>
 #include <QWidget>
 #include <QMutex>
@@ -96,6 +98,7 @@ public:
   virtual void mouseReleaseEvent(QMouseEvent *event) { event->ignore(); };
   virtual void mouseDoubleClickEvent(QMouseEvent *event) { event->ignore(); };
   virtual void keyPressEvent(QKeyEvent *event) { event->ignore(); };
+  virtual void wheelEvent(QWheelEvent* event) { event->ignore(); };
   virtual QAction* getToolButton() = 0;
 
 protected :

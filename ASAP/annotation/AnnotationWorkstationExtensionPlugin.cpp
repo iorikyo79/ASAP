@@ -5,6 +5,7 @@
 #include "ClassToggleTool.h"
 #include "PointSetAnnotationTool.h"
 #include "SplineAnnotationTool.h"
+#include "MagicEraserTool.h"
 #include "AnnotationUndoCommands.h"
 #include "annotation/AnnotationService.h"
 #include "annotation/AnnotationList.h"
@@ -980,6 +981,8 @@ bool AnnotationWorkstationExtensionPlugin::initialize(PathologyViewer* viewer) {
   tool.reset(new PointSetAnnotationTool(this, viewer));
   _annotationTools.push_back(tool);
   tool.reset(new MeasurementAnnotationTool(this, viewer));
+  _annotationTools.push_back(tool);
+  tool.reset(new MagicEraserTool(this, viewer));
   _annotationTools.push_back(tool);
   _annotationService.reset(new AnnotationService());
 

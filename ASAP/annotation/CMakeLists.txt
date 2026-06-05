@@ -13,6 +13,7 @@ SET(ANNOTATION_PLUGIN_HEADERS
     RectangleAnnotationTool.h
     PointSetAnnotationTool.h
     SplineAnnotationTool.h
+    MagicEraserTool.h
     QtAnnotation.h
     QtAnnotationGroup.h
     MeasurementQtAnnotation.h
@@ -33,6 +34,7 @@ SET(ANNOTATION_PLUGIN_SOURCE
     ClassToggleTool.cpp
     PointSetAnnotationTool.cpp
     SplineAnnotationTool.cpp
+    MagicEraserTool.cpp
     QtAnnotation.cpp
     QtAnnotationGroup.cpp
     PolyQtAnnotation.cpp
