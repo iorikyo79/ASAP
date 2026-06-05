@@ -14,7 +14,7 @@ public:
   YellowPolyAnnotationTool(AnnotationWorkstationExtensionPlugin* annotationPlugin, PathologyViewer* viewer);
   std::string name() override;
   QAction* getToolButton() override;
-  QColor getForcedColor() const override { return QColor("#FFFF00"); }
+  QColor getForcedColor() const override { return QColor("#F4FA58"); }
 };
 
 #endif
